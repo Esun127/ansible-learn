@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: True
+  vars:
+    contents: "{{ lookup('template', './tpl.j2') }}"
+
+  tasks:
+    - name: debug inside variables
+      debug:
+        msg: "{{ contents|pprint }}"

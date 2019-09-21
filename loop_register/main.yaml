@@ -1,0 +1,15 @@
+---
+- hosts: all
+  gather_facts: True
+  tasks:
+    - name: debug loops
+      shell: "{{ item }}"
+      with_items:
+        - hostname
+        - uname
+        - date
+      register: ret
+
+    - name: display loops
+      debug:
+        msg: "{% for i in ret.results %} {{ i.stdout }} {% endfor %}"

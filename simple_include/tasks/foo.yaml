@@ -1,0 +1,5 @@
+- name: placeholder foo
+  command: /bin/foo
+
+- name: placeholder bar
+  command: /bin/bar

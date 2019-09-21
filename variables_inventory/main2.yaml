@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: no
+  vars_files:
+    - vars.json
+    - vars.yaml
+  tasks:
+    - name: display host variable from inventory file
+      debug: msg="The {{ inventory_hostname }} value is {{ key }}"

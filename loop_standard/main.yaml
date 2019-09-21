@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+    - name: debug loop
+      debug:
+        msg: "name ------> {{ item }}"
+      with_items:
+        - one
+        - two

@@ -1,0 +1,4 @@
+---
+ - hosts: node2
+   roles:
+     - { role: nginx, version: 1.12.2 }

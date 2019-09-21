@@ -1,0 +1,19 @@
+#!/bin/bash
+# 启动docker容器
+set -e
+source $1 $2 $3
+IMAGE=$image
+NAME=$name
+TAG=$tag
+
+if [ ! -z "$IMAGE" ] && [ ! -z "$NAME" ] && [ ! -z "$TAG" ]; then
+	id=$(/usr/bin/docker run --name $NAME -d ${IMAGE}:${TAG})
+	if [ ! -z "$id" ]; then
+		CHANGED="True"
+		echo {\"containerid\":\"$id\"}
+		exit 0
+	fi
+else
+	echo { \"msg\":\"run docker container error\" }
+	exit 0
+fi

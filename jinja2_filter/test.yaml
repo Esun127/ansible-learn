@@ -1,0 +1,5 @@
+---
+- hosts: all
+  tasks:
+    - name: test jinji2 filter
+      template: src=test.j2 dest=/tmp/test

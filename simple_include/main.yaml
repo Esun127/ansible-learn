@@ -1,0 +1,6 @@
+---
+- hosts: node1
+  remote_user: root
+  tasks: 
+    - include_tasks: tasks/foo.yaml
+  # - import_tasks: tasks/foo.yaml

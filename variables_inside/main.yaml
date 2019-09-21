@@ -1,0 +1,25 @@
+---
+###ansible内置变量:
+- hosts: all
+  gather_facts: False
+  tasks:
+  - name: debug inside variables - groups
+    debug:
+      msg: "{{ groups }}"
+
+  - name: debug inside variables - groups.agent
+    debug:
+      msg: "{{ groups['agent'] }}"
+
+  - name: debug inside variables - group_names # 当前资源的组名
+    debug:
+      msg: "{{ group_names }}"
+
+
+  - name: debug inside variables - inventory_hostname and inventory_hostname_short
+    debug: 
+      msg: "{{ inventory_hostname }} - {{ inventory_hostname_short }}"
+
+  - name: debug inside variables - play_hosts and inventory_dir
+    debug:
+      msg: "{{ play_hosts }} - {{ inventory_dir }}"

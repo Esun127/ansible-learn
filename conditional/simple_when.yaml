@@ -1,0 +1,24 @@
+---
+- hosts: all
+  tasks:
+    - name: Host node2 run this task
+      debug:
+        msg: "{{ ansible_default_ipv4.address }}"
+      when: ansible_nodename == "node2"
+    - name: memtotal < 500M and processor_cores == 2 run this task
+      debug:
+        msg: "{{ ansible_fqdn }}"
+      when: ansible_memtotal_mb < 500 and ansible_processor_cores < 2
+    - name: all host run this task
+      shell: hostname
+      register: info
+
+    - name: Hostname is node1 machine run this task
+      debug:
+        msg: "{{ ansible_fqdn }}"
+      when: info['stdout'] == 'node1'
+
+    - name: Hostname is startwith M run this task
+      debug:
+        msg: "{{ ansible_fqdn }}"
+      when: info['stdout'].startswith('M')

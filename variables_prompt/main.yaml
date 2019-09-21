@@ -1,0 +1,18 @@
+---
+- hosts: all
+  gather_facts: False
+  vars_prompt:
+    - name: 'one'
+      prompt: "Please input one value "
+      private: no
+
+    - name: 'two'
+      prompt: "Please input two value "
+      private: yes
+
+  tasks:
+    - name: display one value
+      debug: msg="one value is {{ one }}"
+
+    - name: display two value
+      debug: msg="two value is {{ two }}"

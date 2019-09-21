@@ -1,0 +1,17 @@
+---
+- name: new openstack instance
+  hosts: all
+  gather_facts: False
+  vars:
+    auth_url: http://10.8.6.2:35357/v2.0/
+    login_username: admin
+    login_tenant: admin
+    login_password: password
+    image_id: xxxxx-xxx-xxxxx-xxx-xxxx
+    keypair_name: XYZ-xyz-xxx
+    private_net: ##############-#####-############
+  connection: local
+  tasks:
+  - nova_compute:
+      auth_url: "{{ auth_url }}"
+

@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: False
+  #vars:
+  #  users:
+  #    shencan:
+  #      name: shencan
+  #      shell: bash
+  #    ruifengyun:
+  #      name: ruifengyun
+  #      shell: zsh
+
+  tasks:
+  - name: debug loops
+    debug:
+      msg: "name --> {{ item.key }} 
+             value --> {{ item.value.name }}
+             shell --> {{ item.value.shell }}"
+    with_dict: #users#    
+      shencan:
+        name: shencan
+        shell: bash
+      ruifengyun:
+        name: ruifengyun
+        shell: zsh
+

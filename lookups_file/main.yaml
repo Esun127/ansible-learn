@@ -1,0 +1,11 @@
+---
+## 从文件/etc/sysconfig/network读取内容写入变量contents中
+- hosts: all
+  gather_facts: False
+  vars:
+    contents: "{{ lookup('file', '/etc/passwd') }}"
+  tasks:
+    - name: debug lookups
+      debug: 
+        msg: "The contents is {% for i in contents.split('\n') %} {{ i }} {% endfor %}"
+

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+    - name: debug loop
+      debug:
+        msg: |
+               key ------> {{ item.key }}
+               value -----> {{ item.value }}
+      with_items:
+        - {'key':'one','value':100}
+        - {'key':'two','value':200}

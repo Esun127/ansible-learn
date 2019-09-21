@@ -1,0 +1,8 @@
+---
+- hosts: all
+  vars:
+    value: "{{ lookup('mysql', ('node1','Ansible','lookup','one')) }}"
+
+  tasks:
+  - name: test lookup
+    template: src=tpl.j2 dest=/tmp/lookup

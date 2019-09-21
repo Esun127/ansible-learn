@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: False
+  vars:
+    contents: "{{ lookup('password', 'ansible_books') }}"
+  tasks:
+    - name: debug lookups
+      debug:
+        msg: "The Contents is {{ contents }}"
+
