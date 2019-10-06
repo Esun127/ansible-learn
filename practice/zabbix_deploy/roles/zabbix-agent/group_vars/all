@@ -1,0 +1,4 @@
+---
+zabbix_server: node1
+zabbix_proxy: node2
+ansible_ssh_user: root

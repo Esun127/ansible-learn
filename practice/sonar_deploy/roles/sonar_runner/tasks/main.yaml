@@ -1,0 +1,22 @@
+---
+- name: uncompress sonar-runner-2.4.zip
+  unarchive:
+    src: sonar-runner-dist-2.4.zip 
+    dest: /opt/sonar
+
+- name: add execute mode and link executable file
+  file:
+    path: /opt/sonar/sonar-runner-2.4/bin/sonar-runner
+    mode: 0755
+    src: /opt/sonar/sonar-runner-2.4/bin/sonar-runner
+    dest: /usr/bin/sonar-runner
+    owner: root
+    group: root
+    state: link
+
+- name: push configure file
+  template:
+    src: sonar-runner.properties.j2
+    dest: /opt/sonar/sonar-runner-2.4/conf/sonar-runner.properties
+
+

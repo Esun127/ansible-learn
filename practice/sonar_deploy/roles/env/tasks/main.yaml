@@ -1,0 +1,43 @@
+---
+- name: push environments
+  copy:
+    src: sonar.sh
+    dest: /etc/profile.d
+    owner: root
+    group: root
+    mode: 0755
+
+- name: enable environments
+  shell: source /etc/profile.d/sonar.sh
+
+
+#- name: create runner group
+#  group: 
+#    name: sonar
+#    state: present
+#    system: yes
+#
+#- name: create runner user
+#  user:
+#    name: sonar
+#    group: sonar
+#    state: present
+#    system: yes
+#    create_home: yes
+#    home: /opt/sonar/sonar
+#    shell: /usr/bash
+
+
+- name: modify sonar runner
+  file:
+    path: /opt/sonar/{{item}}
+    owner: sonar
+    group: sonar
+    recurse: yes
+    state: directory
+  with_items:
+    - sonarqube-6.7
+    - sonar-runner-2.4
+    - sonar-scanner-2.8
+  notify:
+    - "ensure sonar service is running"

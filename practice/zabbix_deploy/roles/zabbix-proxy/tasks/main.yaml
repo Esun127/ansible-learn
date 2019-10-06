@@ -1,0 +1,26 @@
+---
+- name: install zabbix-proxy
+  yum:
+    name: zabbix-proxy-mysql
+    state: installed
+  register: result
+  until: result is success
+  retries: 5
+  delay: 5
+
+
+- name: push zabbix-proxy configfile
+  template:
+    src: zabbix_proxy.conf.j2
+    dest: /etc/zabbix/zabbix_proxy.conf
+  notify:
+    - "restart zabbix-proxy"
+
+
+- name: start zabbix-proxy
+  service:
+    name: zabbix-proxy
+    state: started
+
+
+

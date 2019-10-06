@@ -1,0 +1,83 @@
+---
+- name: create database sonar
+  mysql_db:
+    login_password: "{{root_pass}}"
+    login_user: "{{root_user}}"
+    login_host: localhost
+    login_unix_socket: "{{db_socket}}"
+    name: "{{sonar_db_name}}"
+    state: present
+    encoding: "{{sonar_db_encoding}}"
+    collation: "{{sonar_db_collation}}"
+
+- name: create user for database sonar
+  mysql_user:
+    name: "{{sonar_db_name}}"
+    password: "{{sonar_db_pass}}"
+    host: "{{sonar_db_host}}"
+    priv: "sonar.*:ALL"
+    state: present
+    sql_log_bin: no
+    login_password: "{{root_pass}}"
+    login_user: "{{root_user}}"
+
+#- name: download sonarqube
+#  get_url:
+#    url: "{{url}}" 
+#    dest: /opt
+
+#- name: push sonarqube-6.7.zip
+#  copy: 
+#    src: sonarqube-6.7.zip
+#    dest: /opt/sonar/sonarqube-6.7.zip
+
+#- name: uncompress sonarqube
+#  shell: unzip sonarqube-6.7.zip
+#  args:
+#    chdir: /opt
+
+- name: uncompress sonarqube-6.7.zip
+  unarchive:
+    src: sonarqube-6.7.zip
+    dest: /opt/sonar
+
+#- name: add executeable mode to sonar.sh
+#  file:
+#    path: /opt/sonar/sonarqube-6.7/bin/linux-x86-64/sonar.sh
+#    mode: 0755
+
+- name: add mode and link executeable
+  file:
+    path: /opt/sonar/sonarqube-6.7/bin/linux-x86-64/sonar.sh
+    src: /opt/sonar/sonarqube-6.7/bin/linux-x86-64/sonar.sh
+    dest: /usr/bin/sonar
+    state: link
+    mode: 0755
+
+- name: push manage script
+  copy:
+    src: sonar
+    dest: /etc/init.d
+    owner: root
+    group: root
+    mode: 0755
+
+- name: push config file 1
+  template:
+    src: sonar.properties.j2
+    dest: /opt/sonar/sonarqube-6.7/conf/sonar.properties
+    backup: True
+
+- name: register java_bin_path
+  shell: which java
+  register: java_bin_path
+    
+
+- name: push config file 2
+  template:
+    src: wrapper.conf.j2
+    dest: /opt/sonar/sonarqube-6.7/conf/wrapper.conf
+    backup: True
+
+    
+

@@ -1,0 +1,6 @@
+---
+- name: reload mysqld configure
+  service:
+    name: mysqld
+    state: restarted
+

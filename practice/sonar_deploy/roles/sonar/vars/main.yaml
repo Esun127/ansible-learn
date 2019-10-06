@@ -1,0 +1,5 @@
+---
+url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.zip
+root_user: root
+root_pass: hwQ_%e(A+0gT
+db_socket: /var/lib/mysql/mysql.sock

@@ -1,0 +1,49 @@
+---
+- name: set hostname
+  hostname: name={{hostname}}
+
+- name: change network files
+  shell: sed -i -e "s#HOSTNAME=.*/HOSTNAME={{hostname}}/g" /etc/sysconfig/network
+  when: ansible_kernel.find('el7') == -1
+
+- name: take off firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+
+- name: disable selinux
+  selinux: 
+    configfile: /etc/sysconfig/selinux
+    state: disabled
+
+- name: change selinux online
+  shell: /usr/sbin/setenforce 0
+
+- name: install libselinux-python
+  yum:
+    name: libselinux-python
+    state: installed
+
+- name: copy eple yum source
+  copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - {src: epel.repo, dest: /etc/yum.repos.d/epel.repo}
+    - {src: RPM-GPG-KEY-EPEL-7, dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7}
+    - {src: RPM-GPG-KEY-ZABBIX, dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX}
+    - {src: zabbix.repo, dest: /etc/yum.repos.d/zabbix.repo}
+
+- name: copy /etc/hosts files
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+

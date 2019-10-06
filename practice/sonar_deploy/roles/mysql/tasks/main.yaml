@@ -1,0 +1,85 @@
+---
+- name: push mysql yum repository file
+  copy:
+    src: mysql.repo
+    dest: /etc/yum.repo.d
+    owner: root
+    group: root
+
+- name: install mysql package
+  yum:
+    name: [ 'mysql-community-client', 'mysql-community-server' ]
+    state: installed
+    disablerepo: mysql80-community
+    enablerepo: mysql57-community
+
+- name: push mysql configure file
+  copy:
+    src: my.cnf
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "reload mysqld configure"
+
+- name: ensure mysqld is stopped
+  service:
+    name: mysqld
+    state: stopped
+
+- name: prepare mysql running environment
+  shell: rm -rf /var/lib/mysql/* && rm -f /var/log/mysqld.log
+
+- name: ensure mysql service is running
+  service:
+    name: mysqld
+    state: started
+  register: result
+
+
+- name: get root temporary password
+  shell: grep 'temporary password' /var/log/mysqld.log |tail -1| awk '{ print $NF }'
+  when: result is success
+  register: temp_password
+  until: temp_password.stdout != ''
+  retries: 5
+  delay: 10
+
+- name: display temporary password
+  debug:
+    msg: "{{temp_password.stdout|reverse}}"
+
+- name: close validate_password plugin
+  replace:
+    path: /etc/my.cnf
+    regexp: '#validate_password=off'
+    replace: 'validate_password=off'
+
+- name: restart mysqld service
+  service:
+    name: mysqld
+    state: restarted
+
+- name: update root password
+  #mysql_user:
+  #  name: root
+  #  password: "{{temp_password.stdout|reverse}}"
+  #  login_user: root
+  #  login_password: "{{temp_password.stdout}}"
+  #  update_password: always
+  shell: echo "{{temp_password.stdout|reverse}}" | mysqladmin -p"{{temp_password.stdout}}" password
+  when: temp_password.stdout != ''
+
+- name: set mysql global variables
+  mysql_variables:
+    variable: "{{item.k}}"
+    value: "{{item.v}}"
+  with_items:
+    - {'k':'character_set_server', 'v':'utf8'}
+    - {'k':'collation_server','v':'utf8_general_ci'}
+
+- name: set nopassword login for root
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf

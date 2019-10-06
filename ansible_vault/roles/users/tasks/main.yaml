@@ -1,0 +1,28 @@
+---
+- name: create admin user
+  user: 
+    name: admin 
+    password: "{{ admin_password }}"
+    groups: sudo 
+    shell: /bin/bash
+
+- name: add admin authorized key
+  authorized_key:
+    user: admin
+    key: "{{ shared_publickey }}"
+    state: present
+
+- name: create deploy user
+  user:
+    name: deploy
+    password: "{{ deploy_password }}"
+    groups: www-data
+    shell: /bin/bash
+
+- name: add deploy authorized key
+  authorized_key: 
+    user: deploy
+    key: "{{ shared_publickey }}"
+    state: present
+
+

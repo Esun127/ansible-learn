@@ -1,0 +1,62 @@
+---
+- hosts: node1 
+  remote_user: root
+  gather_facts: False
+  vars_files:
+    - vars.yaml
+  pre_tasks:
+  - name: set selinux off
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: create runner group
+    group:
+      name: sonar
+      state: present
+      system: yes
+
+  - name: create runner user
+    user:
+      name: sonar
+      group: sonar
+      state: present
+      system: yes
+      create_home: yes
+      home: /opt/sonar/
+      shell: /bin/bash
+
+  - name: optimzer kernel parameters
+    sysctl:
+      name: "{{item.k}}"
+      value: "{{item.v}}"
+      state: present
+      reload: yes
+    with_items:
+      - {'k': 'vm.max_map_count', 'v': 262144}
+      - {'k': 'fs.file-max', 'v': 65536}
+
+  - name: optimzer user nofile
+    copy:
+      content: |
+        sonar    -   nproc   4096
+        sonar    -   nofile   65536
+        mysql    -   nproc   4096
+        mysql    -   nofile   65536
+      dest: /etc/security/limits.conf
+
+
+#  - name: optimzer user nproc
+#    shell: 
+#    - name: ensure /opt/sonar exists
+#      file:
+#        path: /opt/sonar
+#        state: directory
+
+  roles:
+    - mysql
+    #- sonar
+    #- sonar_scanner
+    #- sonar_runner
+    #- env
+    

@@ -1,0 +1,16 @@
+---
+- name: if "{{db}}" is exists
+  shell: "mysqlshow -u root -p{{password}} {{db}}"
+  register: check
+
+- name: drop "{{db}}"
+  mysql_db:
+    name: "{{db}}"
+    state: absent
+    login_user: root
+    login_password: "{{password}}"
+  when: check is success
+
+
+
+

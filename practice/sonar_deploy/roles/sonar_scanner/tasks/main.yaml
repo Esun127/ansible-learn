@@ -1,0 +1,25 @@
+---
+- name: uncompress sonar-scanner-2.8.zip
+  unarchive:
+     src: sonar-scanner-2.8.zip
+     dest: /opt/sonar
+
+
+- name: add mode and link executable
+  file:
+    path: /opt/sonar/sonar-scanner-2.8/bin/sonar-scanner
+    mode: 0755
+    src: /opt/sonar/sonar-scanner-2.8/bin/sonar-scanner
+    dest: /usr/bin/sonar-scanner
+    owner: root
+    group: root
+    state: link
+
+
+- name: push configure file
+  template:
+    src: sonar-scanner.properties.j2
+    dest: /opt/sonar/sonar-scanner-2.8/conf/sonar-scanner.properties
+    backup: True
+
+

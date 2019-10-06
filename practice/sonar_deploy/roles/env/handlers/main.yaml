@@ -1,0 +1,16 @@
+---
+- name: ensure sonar service is running
+  sysvinit:
+    name: sonar
+    state: restarted
+    enabled: yes
+    runlevels:
+      - 3
+      - 5
+  become: yes
+  become_user: sonar
+  become_method: sudo
+
+
+
+

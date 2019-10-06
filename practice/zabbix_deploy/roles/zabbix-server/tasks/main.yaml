@@ -1,0 +1,54 @@
+---
+- name: install web environment
+  yum:
+    name:
+      - httpd
+      - php-bcmath
+      - php-mbstring
+      - php-gd
+      - php-xml
+      - php-mysql
+    state: latest 
+
+   
+- name: install zabbix-server
+  yum:
+    name:
+      - zabbix-web
+      - zabbix-web-mysql
+      - zabbix-server-mysql
+    state: installed
+  register: result
+  until: result is success
+  retries: 5
+  delay: 5
+
+- name: check date.timezone option is correct of php.ini
+  shell: grep '^;date.timezone' /etc/php.ini && echo OK || echo NO
+  register: check
+
+- name: update php.ini
+  lineinfile:
+    path: /etc/php.ini
+    regexp: '^;date.timezone =.*'
+    firstmatch: yes
+    line: 'date.timezone = Asia/Shanghai'
+    insertafter: '^;date.timezone =.*'
+  when: check.stdout.find('OK') != -1
+
+- name: push zabbix-server configfile
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf 
+  notify:
+    - "restart zabbix-server"
+
+
+- name: start zabbix-server and httpd
+  service:
+    name: "{{item}}"
+    state: started
+  with_items:
+    - zabbix-server
+    - httpd
+

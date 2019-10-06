@@ -1,0 +1,99 @@
+---
+- name: install mariadb
+  yum: 
+    name: ['mariadb','mariadb-server','python2-PyMySQL','MySQL-python','mysql-connector-python']
+    state: present
+
+- name: copy mariadb configfile
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: "restart mariadb"
+
+- name: start mariadb service
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: check root@localhost is free login
+  shell: mysqladmin ping
+  register: result
+
+
+- name: change root@localhost password
+  mysql_user:
+    name: root
+    password: "{{root_password}}"
+    update_password: always
+  when: result.stdout.find('Access denied') != -1
+
+- name: delete empty user
+  mysql_user:
+    name: '' 
+    state: absent
+    login_user: root
+    login_password: "{{root_password}}"
+
+- name: drop db "{{db_server_name}}" if exists
+  import_tasks: dropdb.yaml
+  vars:
+    password: "{{root_password}}"
+    db: "{{db_server_name}}"
+
+- name: drop db "{{db_proxy_name}}" if exists
+  import_tasks: dropdb.yaml
+  vars:
+    password: "{{root_password}}"
+    db: "{{db_proxy_name}}"
+
+
+- name: create dbs for zabbix
+  mysql_db:
+    name: "{{item}}"
+    state: present
+    collation: utf8_bin
+    encoding: utf8
+    login_user: root
+    login_password: "{{root_password}}"
+  with_items:
+    - "{{db_server_name}}"
+    - "{{db_proxy_name}}"
+
+
+- name: create db_users for zabbix
+  mysql_user:
+    name: "{{item.user}}"
+    password: "{{item.password}}"
+    state: present
+    host: '%' 
+    priv: "{{item.db}}.*:ALL"
+    login_user: root
+    login_password: "{{root_password}}"
+  with_items:
+    - {'user': "{{db_server_username}}", 'password': "{{db_server_password}}", 'db': "{{ db_server_name}}" }
+    - {'user': "{{db_proxy_username}}", 'password': "{{db_proxy_password}}", 'db': "{{db_proxy_name}}" }
+
+- name: push dumpfile
+  copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  with_items:
+    - {src: server.sql, dest: /tmp/server.sql}
+    - {src: proxy.sql, dest: /tmp/proxy.sql}
+
+- name: initial dbs
+  mysql_db:
+    name: "{{item.db}}"
+    state: import
+    target: "{{item.file}}"
+    login_user: root
+    login_password: "{{root_password}}"
+  with_items:
+    - {db: "{{db_server_name}}", file: /tmp/server.sql}
+    - {db: "{{db_proxy_name}}", file: /tmp/proxy.sql}
+    
+

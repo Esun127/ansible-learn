@@ -1,0 +1,8 @@
+---
+sonar_db_name: sonar
+sonar_db_user: sonar
+sonar_db_pass: 1q2w3e4rsonar
+sonar_db_host: localhost
+sonar_db_port: 3306
+sonar_db_encoding: utf8
+sonar_db_collation: utf8_general_ci

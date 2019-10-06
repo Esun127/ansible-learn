@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: True
+  vars:
+    contents: "{{lookup('template', './hosts.j2')}}"
+  tasks:
+    - name: debug inside varaibles
+      debug:
+        msg: "{{ contents}}"

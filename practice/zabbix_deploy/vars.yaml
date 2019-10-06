@@ -1,0 +1,9 @@
+---
+root_password: rootroot
+db_server_name: zabbix_server
+db_server_username: server
+db_server_password: zabbixserver
+db_proxy_name: zabbix_proxy
+db_proxy_username: proxy
+db_proxy_password: zabbixproxy
+

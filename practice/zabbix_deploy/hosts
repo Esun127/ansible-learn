@@ -1,0 +1,17 @@
+[zabbix_server]
+192.168.1.101       ansible_ssh_connection=local    hostname=node1.bolod.xin
+
+[zabbix_proxy]
+192.168.1.102       hostname=node2.bolod.xin
+
+[mysql]
+192.168.1.103       hostname=node3.bolod.xin
+
+[zabbix_agent]
+192.168.1.10[1:3]
+192.168.1.104       hostname=node4.bolod.xin
+
+
+[zabbix_agent:vars]
+ansible_ssh_user=root
+ansible_ssh_pass=rootroot
