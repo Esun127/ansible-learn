@@ -1,0 +1,21 @@
+---
+- name: init base environment for all hosts
+  hosts: all
+  roles:
+    - { role: common, tags: base }
+
+- name: install mysql
+  hosts: db
+  roles:
+    - mariadb
+
+- name: install apache and php
+  hosts: web
+  roles:
+    - { role: apache, tags: web }
+
+- name: install haproxy
+  hosts: lb
+  roles:
+    - { role: haproxy, tags: lb }
+

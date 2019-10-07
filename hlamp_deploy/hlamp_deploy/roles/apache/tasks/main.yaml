@@ -1,0 +1,21 @@
+---
+- name: install apache and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+      - libsemanage-python
+      - libselinux-python
+
+- name: push file - index.php.j2
+  template:
+    src: index.php.j2
+    dest: /var/www/html/index.php
+
+- name: start apache
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+

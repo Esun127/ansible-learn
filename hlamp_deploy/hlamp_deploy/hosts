@@ -1,0 +1,8 @@
+[web]
+node[3:4].bolod.xin
+
+[db]
+node2.bolod.xin
+
+[lb]
+node1.bolod.xin

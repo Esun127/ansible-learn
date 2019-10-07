@@ -1,0 +1,43 @@
+---
+- name: debug variables
+  debug:
+    msg: '{{hostname}}'
+- name: set host name
+  hostname:
+    name: '{{hostname}}'
+- name: push files
+  copy:
+    src: '{{item.src}}'
+    dest: '{{item.dest}}'
+  with_items:
+    - {src: resolv.conf, dest: /etc/resolv.conf}
+    - {src: epel.repo, dest: /etc/yum.repos.d/epel.repo}
+    - {src: RPM-GPG-KEY-EPEL-7, dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7}
+- name: push templates
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+- name: Disable SELinux
+  selinux:
+    state: disabled
+- name: set off selinux
+  shell: setenforce 0
+- name: set off firewalld and postfix
+  service:
+    name: '{{item}}'
+    state: stopped
+    enabled: no
+  with_items:
+    - firewalld
+    - postfix
+- name: install necesary softwares
+  yum:
+    update_cache: yes
+    name: 
+      - vim* 
+      - python-keyczar
+      - python2-PyMySQL
+      - python2-pip
+      - python-ipython
+    state: present
+    

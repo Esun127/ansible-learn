@@ -1,0 +1,12 @@
+---
+- name: install MySQL-python
+  yum: name=MySQL-python,ntpdate state=installed
+- name: Set timezone to Asia/Shanghai
+  timezone:
+    name: Asia/Shanghai
+- name: datetime sync
+  cron:
+    name: 'datetime sync'
+    minute: 5
+    job: "/usr/sbin/ntpdate time1.aliyun.com &> /dev/null"
+

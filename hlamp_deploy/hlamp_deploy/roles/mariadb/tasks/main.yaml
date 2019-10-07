@@ -1,0 +1,35 @@
+---
+- name: install mariadb-server
+  yum:
+    name:
+      - mariadb-server
+      - mariadb
+    state: installed
+
+- name: push file - my.cnf
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+  notify:
+    - 'restart mariadb'
+
+- name: start mariadb
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: create database
+  mysql_db:
+    name: '{{database}}'
+    state: present
+
+- name: create user
+  mysql_user: 
+    name: '{{user}}'
+    password: '{{password}}'
+    priv: '*.*:ALL'
+    host: '%'
+    state: present
+
+
