@@ -1,0 +1,11 @@
+---
+- name: ensure know hosts file is absent
+  file:
+    path: "{{ssh_know_hosts_file}}"
+    state: absent
+
+- name: fill know hosts file
+  shell: "ssh-keyscan -t ecdsa {{item}} >> {{ssh_know_hosts_file}}"
+  with_items: 
+    "{{groups['sshknowhosts']}}"
+

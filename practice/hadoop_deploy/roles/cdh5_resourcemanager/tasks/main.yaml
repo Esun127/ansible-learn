@@ -1,0 +1,7 @@
+---
+- name: start resource manager.
+  command: "/bin/bash {{common['soft_link_base_path']}}/hadoop/sbin/yarn-daemon.sh start resourcemanager"
+
+- name: start job history server.
+  command: "bin/bash {{common['soft_link_base_path']}}/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver"
+

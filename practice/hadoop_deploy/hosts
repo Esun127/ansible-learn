@@ -1,0 +1,43 @@
+[nodes]
+192.168.1.101	hostname=node1
+192.168.1.102	hostname=node2
+192.168.1.103	hostname=node3
+192.168.1.104	hostname=node4
+192.168.1.105	hostname=node5
+
+
+[cobblers]
+node1
+
+
+[NN]
+node1
+
+[SNN]
+node2
+
+
+[RM]
+node3
+
+[JHS]
+node3
+
+[DNS]
+node[1:5]
+
+
+[hadoopclusters:children]
+NN
+SNN
+RM
+JHS
+DNS
+
+
+
+[sshknowhosts:children]
+hadoopclusters
+
+[windows]
+192.168.1.91

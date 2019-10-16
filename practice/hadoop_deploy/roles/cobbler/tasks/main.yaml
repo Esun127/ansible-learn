@@ -1,0 +1,76 @@
+---
+- name: install cobbler
+  yum: 
+    name:
+      - cobbler
+      - cobbler-web
+      - xinetd
+      - tftp
+      - rsync
+      - pykickstart
+      - httpd
+      - dhcp
+      - syslinux
+    state: installed
+
+
+- name: enable tftp and 
+  lineinfile:
+    dest: '/etc/xinetd.d/tftp'
+    regexp: '^disabled='
+    line: 'disabled=no'
+  notify:
+    - 'restart xinetd'
+  tags:
+    - services
+    - xinetd
+
+- name: generate cobbler default_password
+  shell: openssl passwd -1 -salt  'bolod' 'nihaoma'
+  register: result
+
+- name: push cobbler templates
+  template:
+    src: '{{item}}'
+    dest: /etc/cobbler/
+  with_items:
+    - dhcp.template
+    - modules.conf
+    - settings
+  notify:
+    - 'sync cobbler'
+    - 'restart cobbler'
+  tags:
+    - templates
+
+- name: get loader
+  shell: cobbler get-loaders
+
+- name: push file - cobbler kickstart script
+  copy:
+    src: cluster.ks
+    dest: /var/lib/cobbler/kickstarts/
+
+- name: enable and start service
+  service:
+    name: '{{item}}'
+    state: started
+    enabled: yes
+  with_items:
+    - cobblerd
+    - xinetd
+    - httpd
+    - rsyncd
+  tags:
+    - services
+
+
+- name: enabled dhcp service
+  service:
+    name: dhcpd
+    enabled: yes
+  notify:
+    - 'sync cobbler'
+    - 'restart cobbler'
+  tags:
+    - services

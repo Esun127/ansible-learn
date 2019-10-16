@@ -1,0 +1,21 @@
+- name: generate ssh key-pairs for root
+  hosts: nodes
+  remote_user: root
+  gather_facts: False
+  tasks:
+    - name: ensure ~/.ssh is present
+      file:
+        path: ~/.ssh
+        state: directory
+        recurse: yes
+
+    - name: generate openssh_pairs
+      openssh_keypair:
+        path: ~/.ssh/id_rsa
+        force: True
+        state: present
+        mode: 0600
+
+    - name: generate know_hosts
+      shell: "ssh-keyscan -t ecdsa {{item}} >> ~/.ssh/known_hosts"
+      with_items: '{{groups.nodes}}'

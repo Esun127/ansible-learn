@@ -1,0 +1,48 @@
+---
+- name: initial machine environment
+  hosts: nodes
+  remote_user: root
+  gather_facts: True
+  roles:
+    - { role: commons, tags: init }
+
+#- name: deploy cobbler
+#  hosts: cobblers
+#  roles:
+#    - { role: cobbler, tags: cobbler }
+
+- name: prepare bigdata environment
+  hosts: nodes
+  vars:
+    hadoop_user: bigdata
+  roles:
+    - { role: base, tags: base } 
+
+- name: generate ssh-pair-key
+  hosts: sshknowhosts
+  roles:
+    - { role: freelogin, tags: freelogin }
+
+- name: set know hosts
+  hosts: sshknowhosts
+  become: yes
+  become_user: '{{hadoop_user}}'
+  become_method: sudo
+  roles:
+    - { role: sshknowhosts, tags: knowhosts }
+
+- name: install jdk
+  hosts: sshknowhosts
+  roles:
+    - { role: jdk, tags: jdk }
+
+- name: prepare install hadoop
+  hosts: hadoopclusters
+  remote_user: root
+  roles:
+    - { role: cdh5_commons, tags: cdh5commons }
+
+- name: prepare start namenode
+  hosts: NN
+  roles:
+    - { role: cdh5_namenode_active, tags: nn }

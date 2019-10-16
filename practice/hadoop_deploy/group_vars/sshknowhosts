@@ -1,0 +1,18 @@
+---
+java_home: /usr/lib/java
+jdk_rootdir: /opt/java
+jdk_packname: jdk-8u131-linux-x64.tar.gz
+jdk_unpackname: jdk1.8.0_131
+java_bins:
+  - java
+  - javac
+  - javaws
+  - javah
+  - jar
+  - jps
+
+
+hadoop_user: bigdata
+hadoop_group: bigdata
+hadoop_password: $1$laixun$P0wEPced5VbED1VyxVtMw.
+ssh_know_hosts_file: ~/.ssh/known_hosts

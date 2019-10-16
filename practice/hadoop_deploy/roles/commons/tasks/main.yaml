@@ -1,0 +1,73 @@
+---
+- name: set hostname
+  hostname:
+    name: '{{hostname}}'
+
+- name: push file - /etc/resolv.conf
+  copy:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+
+- name: clean old repos
+  file:
+    path: '{{item}}'
+    state: absent
+  with_fileglob:
+    - /etc/yum.repos.d/*.repo
+ 
+- name: push file - repos
+  copy:
+    src: '{{item.src}}'
+    dest: '{{item.dest}}'
+  with_items:
+    - {src: Centos-7.repo, dest: /etc/yum.repos.d/Centos-7.repo}
+    - {src: epel-7.repo, dest: /etc/yum.repos.d/epel-7.repo}
+    - {src: RPM-GPG-KEY-EPEL-7, dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7}
+
+- name: push file - /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+
+- name: set off firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: get selinux status
+  shell: 'getenforce'
+  register: result
+
+- name: set off selinux on line
+  shell: 'setenforce 0'
+  when: result.stdout != 'Disabled'
+
+- name: set off selinux
+  selinux:
+    state: disabled
+
+- name: set timezone
+  timezone:
+    name: Asia/Shanghai
+
+- name: install necesary packages
+  yum:
+    name:
+      - vim
+      - ntpdate
+      - python2-PyMySQL
+      - python-keyczar
+      - MySQL-python
+    state: installed
+    update_cache: yes
+
+- name: sync datetime
+  shell: ntpdate time1.aliyun.com 
+
+- name: add sync time job
+  cron:
+    name: sync time
+    minute: 5
+    job: '/usr/sbin/ntpdate time1.aliyun.com &> /dev/null'
+

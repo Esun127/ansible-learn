@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>{{hadoop_map_reduce['mr_map_mem_mb']}}</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>{{hadoop_map_reduce['mr_reduce_mem_mb']}}</value>
+  </property>
+
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value>{{hadoop_map_reduce['mr_tt_map_task_max']}}</value>
+  </property>
+
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <value>{{hadoop_map_reduce['mr_tt_reduce_task_max']}}</value>
+  </property>
+
+
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>{{hadoop_map_reduce['mr_map_java_opts']}}</value>
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>{{hadoop_map_reduce['mr_reduce_java_opts']}}</value>
+  </property>
+
+ <property>
+    <name>mapreduce.jobhistory.address</name>
+    <value>{% for server in groups['JHS'] %}{% if not loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}{{server}}{% endfor %}:10020</value>
+ </property>
+ 
+ <property>
+   <name>mapreduce.jobhistory.webapp.address</name>
+    <value>{% for server in groups['JHS'] %}{% if not loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}{{server}}{% endfor %}:19888</value>
+ </property>
+
+ </configuration>
+

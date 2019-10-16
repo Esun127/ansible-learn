@@ -1,0 +1,28 @@
+---
+hadoop_version: hadoop-2.6.0-cdh5.11.1
+common:
+  install_base_path: '/opt'
+  soft_link_base_path: "/home/{{hadoop_user}}/"
+hadoop_hdfs:
+  dfs_replication: 2
+  dfs_dir_parent: 
+    - '/data1/'
+    - '/data2/'
+  dfs_dir_namenode: 'namenode' 
+  dfs_dir_sec_namenode: 'secondary_namenode' 
+  dfs_dir_datanode:
+    - '/datanode/'
+  dfs_datanode_max_xcievers: 2
+hadoop_yarn: 
+  yarn_nodemgr_local_dir: 
+    - '/tmp/hadoop'
+  yarn_nodemgr_resource_mem_mb: 100
+  yarn_scheduler_min_alloc_mb: 100
+  yarn_log_aggr_enable: 'false'
+hadoop_map_reduce:
+  mr_map_mem_mb: 100
+  mr_reduce_mem_mb: 100
+  mr_tt_map_task_max: 4
+  mr_tt_reduce_task_max: 2
+  mr_map_java_opts:  '-Xmx200m'
+  mr_reduce_java_opts:  '-Xmx200m'

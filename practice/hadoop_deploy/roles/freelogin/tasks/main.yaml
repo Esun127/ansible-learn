@@ -1,0 +1,41 @@
+---
+- name: create a user `"{{hadoop_user}}"` for all our hadoop modules
+  user:
+    name: '{{hadoop_user}}'
+    password: '{{hadoop_password}}'
+
+- name: create a .ssh directory
+  file:
+    path: ~/.ssh
+    state: directory
+    owner: '{{hadoop_user}}'
+    group: '{{hadoop_group}}'
+    mode: 0700
+  sudo: yes
+  sudo_user: '{{hadoop_user}}'
+
+
+- name: lets copy the template idi_rsa to auth_keys location
+  template:
+    src: id_rsa.pub
+    dest: ~/.ssh/authorized_keys
+    mode: 0644
+  sudo: yes
+  sudo_user: '{{hadoop_user}}'
+
+- name: lets copy id_rsa to location .ssh
+  template:
+    src: id_rsa
+    dest: ~/.ssh/id_rsa
+    mode: 0600
+  sudo: yes
+  sudo_user: '{{hadoop_user}}'
+
+- name: lets copy id_rsa.pub to location .ssh
+  template:
+    src: id_rsa.pub
+    dest: ~/.ssh/id_rsa.pub
+    mode: 0644
+  sudo: yes
+  sudo_user: '{{hadoop_user}}'
+

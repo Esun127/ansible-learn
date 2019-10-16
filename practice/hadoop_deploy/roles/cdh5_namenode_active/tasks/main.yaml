@@ -1,0 +1,33 @@
+---
+- name: create namenode directory
+  file: 
+    path: '{{item}}{{hadoop_hdfs.dfs_dir_namenode}}'
+    owner: '{{hadoop_user}}'
+    group: '{{hadoop_group}}'
+    state: directory
+  with_items: '{{hadoop_hdfs.dfs_dir_parent}}'
+
+- name: create secondary namenode diresctory
+  file:
+    path: '{{item}}{{hadoop_hdfs.dfs_dir_sec_namenode}}'
+    owner: '{{hadoop_user}}'
+    group: '{{hadoop_group}}'
+    state: directory
+  with_items: '{{hadoop_hdfs.dfs_dir_parent}}'
+
+
+- name: format the namenode
+  shell: "./hdfs namenode -format"
+  args:
+    creates: '{{hadoop_hdfs.dfs_dir_parent[0]}}/{{hadoop_hdfs.dfs_dir_namenode}}/current/VERSION'
+    chdir: "{{common['soft_link_base_path']}}/hadoop/bin"
+  sudo: yes
+  sudo_user: "{{hadoop_user}}"
+
+- name: starting namenode service
+  shell: "./hadoop-daemon.sh start namenode"
+  args:
+    chdir: "{{common['soft_link_base_path']}}/hadoop/sbin"
+  sudo: yes
+  sudo_user: "{{hadoop_user}}"
+   

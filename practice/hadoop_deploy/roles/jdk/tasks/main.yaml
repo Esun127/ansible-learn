@@ -1,0 +1,50 @@
+---
+- name: ensure openjdk is uninstalled
+  yum:
+    name: openjdk
+    state: absent
+
+- name: ensure install_dir is existed
+  file:
+    path: '{{jdk_rootdir}}'
+    state: directory
+
+- name: unarchive oracle jdk
+  unarchive:
+    src: 'files/{{jdk_packname}}'
+    dest: '{{jdk_rootdir}}'
+    creates: '{{jdk_rootdir}}/{{jdk_unpackname}}'
+
+- name: update the symbolic link to jdk install
+  file:
+    path: '{{java_home}}'
+    src: '{{jdk_rootdir}}/{{jdk_unpackname}}'
+    state: link
+    force: yes
+
+- name: update java envrionment
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^JAVA_HOME={{java_home}}'
+    line: 'JAVA_HOME={{java_home}}'
+    state: present
+
+- name: add the jdk binaries to the system path
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^PATH=.*JAVA_HOME.*'
+    line: 'PATH=$PATH:$HOME/bin:$JAVA_HOME/bin'
+    state: present
+
+- name: remove alternatives before we set them
+  command: 'rm -f /var/lib/alternatives/{{item}}'
+  with_items: '{{java_bins}}'
+
+- name: inform the system where oracle jdk is located
+  alternatives:
+    name: '{{item}}'
+    link: '/usr/bin/{{item}}'
+    path: '{{jdk_rootdir}}/{{jdk_unpackname}}/bin/{{item}}'
+  with_items: '{{java_bins}}'
+
+

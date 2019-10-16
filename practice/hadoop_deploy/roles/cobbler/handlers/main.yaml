@@ -1,0 +1,9 @@
+---
+- name: sync cobbler
+  shell: cobbler sync
+
+- name: restart cobbler
+  service:
+    name: cobblerd
+    state: restarted
+

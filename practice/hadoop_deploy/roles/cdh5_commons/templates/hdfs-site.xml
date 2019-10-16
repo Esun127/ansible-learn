@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+  <property>
+    <name>dfs.replication</name>
+    <value>{{hadoop_hdfs['dfs_replication']}}</value>
+  </property>
+  <property>
+     <name>dfs.permissions</name>
+     <value>false</value>
+  </property>
+  <!-- Immediately exit safemode as soon as one DataNode checks in. 
+       On a multi-node cluster, these configurations must be removed.  -->
+  <property>
+    <name>dfs.safemode.extension</name>
+    <value>0</value>
+  </property>
+  <property>
+     <name>dfs.safemode.min.datanodes</name>
+     <value>1</value>
+  </property>
+  <property>
+     <!-- specify this so that running 'hadoop namenode -format' formats the right dir -->
+     <name>dfs.name.dir</name>
+     <value>{% for data_dir_parent in hadoop_hdfs['dfs_dir_parent'] %}{% if not  loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}file://{{data_dir_parent}}{{hadoop_hdfs['dfs_dir_namenode']}}{% endfor %}</value>
+  </property>
+  <property>
+     <name>dfs.datanode.data.dir</name>
+     <value>{% for data_dir in hadoop_hdfs['dfs_dir_datanode'] %}{% if not loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}file://{{data_dir}}{% endfor %}</value>
+  </property>
+  <property>
+     <name>dfs.namenode.secondary.http-address</name>
+     <value>{% for server in groups['SNN'] %}{% if not loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}{{server}}{% endfor %}:50090</value>
+  </property>
+  <property>
+     <name>dfs.namenode.checkpoint.dir</name>
+     <value>{% for data_dir in hadoop_hdfs['dfs_dir_parent'] %}{% if not loop.first and flag == 1 %},{% else %}{% set flag=1 %}{% endif %}file://{{data_dir}}{{hadoop_hdfs['dfs_dir_sec_namenode']}}{% endfor %}:50090</value>
+  </property>
+  <property>
+     <name>dfs.datanode.max.xcievers</name>
+     <value>{{hadoop_hdfs['dfs_datanode_max_xcievers']}}</value>
+  </property>
+  <!-- Enable Hue Plugins -->
+  <property>
+    <name>dfs.namenode.plugins</name>
+    <value>org.apache.hadoop.thriftfs.NamenodePlugin</value>
+    <description>Comma-separated list of namenode plug-ins to be activated.
+    </description>
+  </property>
+  <property>
+    <name>dfs.datanode.plugins</name>
+    <value>org.apache.hadoop.thriftfs.DatanodePlugin</value>
+    <description>Comma-separated list of datanode plug-ins to be activated.
+    </description>
+  </property>
+  <property>
+    <name>dfs.thrift.address</name>
+    <value>0.0.0.0:10090</value>
+  </property>
+</configuration>

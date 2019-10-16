@@ -1,0 +1,41 @@
+---
+- name: copy and unarchive the package in destination server.
+  unarchive:
+    creates: "{{common.install_base_path}}/{{hadoop_version}}"
+    src: '{{hadoop_version}}.tar.gz'
+    dest: "{{common.install_base_path}}"
+    owner: "{{hadoop_user}}"
+    group: "{{hadoop_group}}"
+
+- name: change directory permissions
+  file: 
+    path: "{{common.install_base_path}}/{{hadoop_version}}"
+    owner: "{{hadoop_user}}"
+    group: "{{hadoop_group}}"
+    recurse: yes
+
+- name: "create a symbolic link in {{common['install_base_path']}}/hadoop"
+  file:
+    src: "{{common.install_base_path}}/{{hadoop_version}}"
+    path: "{{common['soft_link_base_path']}}/hadoop"
+    state: link
+    owner: "{{hadoop_user}}"
+    group: "{{hadoop_group}}"
+  sudo: yes
+  sudo_user: "{{hadoop_user}}"
+
+- name: updating congiuration file in zookeeper
+  sudo: yes
+  sudo_user: "{{hadoop_user}}"
+  template:
+    src: "{{item}}"
+    dest: "{{common['soft_link_base_path']}}/hadoop/etc/hadoop/"
+    owner: "{{hadoop_user}}"
+    group: "{{hadoop_group}}"
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml
+    - yarn-site.xml
+    - slaves
+    - mapred-site.xml
+    - hadoop-env.sh
